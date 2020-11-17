@@ -12,7 +12,7 @@ router.get('/', function (ctx, next) {
       title: '设备xxx传感器断开',
       time: '2020/11/23 14:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/Dpw9J0.png"
+      icon: "http://img.anlengyun.top/jinggao.png"
     },
     {
       msg_id: 2,
@@ -20,7 +20,7 @@ router.get('/', function (ctx, next) {
       title: '设备xxx在XXX上线',
       time: '2020/11/23 12:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/DpwFQU.png"
+      icon: "http://img.anlengyun.top/youjian.png"
     },
     {
       msg_id: 3,
@@ -28,7 +28,7 @@ router.get('/', function (ctx, next) {
       title: '安冷云年终大促',
       time: '2020/11/23 14:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/DpwCWV.png"
+      icon: "http://img.anlengyun.top/biaoqian.png"
     },
     {
       msg_id: 4,
@@ -36,7 +36,7 @@ router.get('/', function (ctx, next) {
       title: '设备xxx电量不足20%',
       time: '2020/11/23 14:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/Dpw9J0.png"
+      icon: "http://img.anlengyun.top/jinggao.png"
     },
     {
       msg_id: 5,
@@ -44,7 +44,7 @@ router.get('/', function (ctx, next) {
       title: '设备xxx完成了一次记录',
       time: '2020/11/23 12:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/DpwFQU.png"
+      icon: "http://img.anlengyun.top/youjian.png"
     },
     {
       msg_id: 6,
@@ -52,7 +52,7 @@ router.get('/', function (ctx, next) {
       title: '安冷云新人礼',
       time: '2020/11/23 14:50',
       readed: false,
-      icon: "https://s3.ax1x.com/2020/11/13/DpwCWV.png"
+      icon: "http://img.anlengyun.top/biaoqian.png"
     },
   ]
   ctx.body = result
