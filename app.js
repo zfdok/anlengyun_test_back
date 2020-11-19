@@ -6,36 +6,11 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const cors = require('koa2-cors');
-const httpProxy = require('http-proxy-middleware');
-const k2c = require('koa2-connect');
-
-
 
 const index = require('./routes/index')
 const user = require('./routes/user')
 const routes = require('./routes/routes')
 const headernotice = require('./routes/headernotice')
-
-
-app.use(async (ctx, next) => {
-  console.log("OK!!!API!!!");
-  console.log(ctx.url);
-  if (ctx.url.startsWith('/onenet')) { //匹配有api字段的请求url
-    console.log("OK!!!ONENET!!!");
-
-    ctx.respond = false // 绕过koa内置对象response ，写入原始res对象，而不是koa处理过的response
-    await k2c(httpProxy({
-      target: 'https://www.ipip5.com/today/api.php/',
-      changeOrigin: true,
-      secure: false,
-      pathRewrite: {
-        '^/onenet': ''
-      }
-    }))(ctx, next);
-  }
-  await next()
-})
-
 
 app.use(
   cors({
