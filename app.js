@@ -11,6 +11,7 @@ const index = require('./routes/index')
 const user = require('./routes/user')
 const routes = require('./routes/routes')
 const headernotice = require('./routes/headernotice')
+const onenet = require('./routes/onenet')
 
 app.use(
   cors({
@@ -50,11 +51,20 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
+// 全局变量
+app.use(async (ctx, next) => {
+  ctx.state.projectID1 = 'Sd5MPm';
+  ctx.state.userToken = 'version=2020-05-29&res=userid%2F163120&et=1763514709&method=sha1&sign=ftEhYGS5HqfRd7ubdLJ5JQGizkY%3D'
+  await next();
+})
+
 // routes
 app.use(index.routes(), index.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 app.use(routes.routes(), routes.allowedMethods())
 app.use(headernotice.routes(), headernotice.allowedMethods())
+app.use(onenet.routes(), onenet.allowedMethods())
+
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
