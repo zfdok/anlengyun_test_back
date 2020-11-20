@@ -32,10 +32,10 @@ router.get('/get_project_info', async (ctx, next) => {
       qs: {
         action: 'QueryStatistics',
         version: 1,
-        project_id: 'Sd5MPm',
+        project_id: ctx.state.projectID1,
       },
       headers: {
-        Authorization: ctx.state.userToken
+        Authorization: ctx.state.userToken1
       }
     }, function (error, response, body) {
       result.msg = response
@@ -56,7 +56,7 @@ router.get('/get_user_project_info', async (ctx, next) => {
   let username = ctx.request.query.user
   let user_group_id;
   //假装查了数据库,并返回了用户对应的分组ID
-  if (username == 'admin') {
+  if (username == '熊爸') {
     user_group_id = 'HkhwSb'
   }
   return new Promise((resolve, reject) => {
@@ -68,11 +68,11 @@ router.get('/get_user_project_info', async (ctx, next) => {
       qs: {
         action: 'QueryGroupDetail',
         version: 1,
-        project_id: 'Sd5MPm',
+        project_id: ctx.state.projectID1,
         group_id: user_group_id,
       },
       headers: {
-        Authorization: ctx.state.userToken
+        Authorization: ctx.state.userToken1
       }
     }, function (error, response, body) {
       result.msg = response

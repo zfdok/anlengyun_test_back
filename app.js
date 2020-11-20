@@ -54,7 +54,7 @@ app.use(async (ctx, next) => {
 // 全局变量
 app.use(async (ctx, next) => {
   ctx.state.projectID1 = 'Sd5MPm';
-  ctx.state.userToken = 'version=2020-05-29&res=userid%2F163120&et=1763514709&method=sha1&sign=ftEhYGS5HqfRd7ubdLJ5JQGizkY%3D'
+  ctx.state.userToken1 = 'version=2020-05-29&res=userid%2F163120&et=1763514709&method=sha1&sign=ftEhYGS5HqfRd7ubdLJ5JQGizkY%3D'
   await next();
 })
 
