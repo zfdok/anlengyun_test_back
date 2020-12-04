@@ -17,7 +17,7 @@ router.post('/login', function (ctx, next) {
   } else {
     result.code = 0
     console.log(typeof (result.code));
-    result.message = '上午好' + '，欢迎回来'
+    result.message = '下午好' + '，欢迎回来'
     console.log(typeof (result.message));
     result.data = {}
     result.data.user = {
