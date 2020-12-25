@@ -337,8 +337,8 @@ router.get('/get_device_history', async (ctx, next) => {
         product_id: product_id,
         device_name,
         identifier,
-        start_time, end_time,
-        sort: "2", offset,
+        start_time, end_time, offset,
+        sort: "2",
         limit
       },
       headers: {
