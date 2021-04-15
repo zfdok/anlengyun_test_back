@@ -12,6 +12,9 @@ const user = require('./routes/user')
 const routes = require('./routes/routes')
 const headernotice = require('./routes/headernotice')
 const onenet = require('./routes/onenet')
+const sslify = require('koa-sslify').default
+
+app.use(sslify())
 
 app.use(
   cors({
