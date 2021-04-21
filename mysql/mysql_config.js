@@ -1,8 +1,8 @@
 const mysqlConfig = {
   user: "fineday",
-  password: "Al77776666!",
-  database: "alyun",
-  host: "140.143.229.183",
+  password: "xxxxxxx!",
+  database: "xxx",
+  host: "xxx.xxx.xxx.xxx",
   port: 3306,
   timezone: '08:00'
 };
