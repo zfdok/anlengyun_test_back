@@ -1,6 +1,8 @@
 const router = require('koa-router')()
 const { log } = require('debug');
 var request = require('request');
+const { query } = require("../mysql/query"); //引入异步查询方法
+const { QUERY_A_DATA_BY_WHERE } = require("../mysql/sql"); //部分引入sql库
 
 router.prefix('/onenet')
 
@@ -33,6 +35,13 @@ function get_product_type(ctx, type) {
       break;
   }
   return product_id;
+}
+
+//验证用户并获取groupid
+async function get_groupid_by_user(username) {
+  await query('set names latin1')
+  let query_res = await query(QUERY_A_DATA_BY_WHERE("alyun.users", "username", username, "user_group_id"));
+  return query_res[0].user_group_id
 }
 //获取项目信息
 router.get('/get_project_info', async (ctx, next) => {
@@ -70,10 +79,8 @@ router.get('/get_user_project_info', async (ctx, next) => {
   }
   let username = ctx.request.query.user
   let user_group_id;
-  //假装查了数据库,并返回了用户对应的分组ID
-  if (username == '熊爸') {
-    user_group_id = 'AYqdps'
-  }
+  //查询用户分组
+  user_group_id = await get_groupid_by_user(username)
   return new Promise((resolve, reject) => {
     request({
       method: 'GET',
@@ -107,11 +114,9 @@ router.get('/get_device_latest', async (ctx, next) => {
   let username = ctx.request.query.user
   let device_name = ctx.request.query.device_name
   let type = ctx.request.query.type
-  let product_id =  get_product_type(ctx, type)
-  //假装查了数据库,并返回了用户对应的分组ID
-  if (username == '熊爸') {
-    user_group_id = 'AYqdps'
-  }
+  let product_id = get_product_type(ctx, type)
+  //查询用户分组ID
+  user_group_id = await get_groupid_by_user(username)
   return new Promise((resolve, reject) => {
     request({
       method: 'GET',
@@ -141,7 +146,7 @@ router.get('/get_device_latest', async (ctx, next) => {
     ctx.body;
   }
 
-  //获取设备详情
+//获取设备详情
 router.get('/get_device', async (ctx, next) => {
   let result = {
     code: -1
@@ -149,11 +154,9 @@ router.get('/get_device', async (ctx, next) => {
   let username = ctx.request.query.user
   let device_name = ctx.request.query.device_name
   let type = ctx.request.query.type
-  let product_id =  get_product_type(ctx, type)
-  //假装查了数据库,并返回了用户对应的分组ID
-  if (username == '熊爸') {
-    user_group_id = 'AYqdps'
-  }
+  let product_id = get_product_type(ctx, type)
+  //查询用户分组ID
+  user_group_id = await get_groupid_by_user(username)
   return new Promise((resolve, reject) => {
     request({
       method: 'GET',
@@ -183,7 +186,7 @@ router.get('/get_device', async (ctx, next) => {
     ctx.body;
   }
 
-  //获取用户拥有的设备列表
+//获取用户拥有的设备列表
 router.get('/get_user_devicelist', async (ctx, next) => {
   let result = {
     code: -1
@@ -192,12 +195,10 @@ router.get('/get_user_devicelist', async (ctx, next) => {
   let user_group_id;
 
   let type = ctx.request.query.type
-  let product_id =  get_product_type(ctx, type)
+  let product_id = get_product_type(ctx, type)
 
-  //假装查了数据库,并返回了用户对应的分组ID
-  if (username == '熊爸') {
-    user_group_id = 'AYqdps'
-  }
+  //查询用户分组ID
+  user_group_id = await get_groupid_by_user(username)
   return new Promise((resolve, reject) => {
     request({
       method: 'GET',
@@ -241,14 +242,10 @@ router.get('/get_device_history', async (ctx, next) => {
   let identifier = ctx.request.query.identifier
   let offset = ctx.request.query.offset
   let limit = ctx.request.query.limit
-  let product_id =  get_product_type(ctx, type)
+  let product_id = get_product_type(ctx, type)
 
-  console.log(identifier);
-
-  //假装查了数据库,并返回了用户对应的分组ID
-  if (username == '熊爸') {
-    user_group_id = 'AYqdps'
-  }
+  //查询用户分组ID
+  user_group_id = await get_groupid_by_user(username)
   return new Promise((resolve, reject) => {
     request({
       method: 'GET',

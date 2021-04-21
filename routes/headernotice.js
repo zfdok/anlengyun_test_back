@@ -59,14 +59,12 @@ router.get('/', function (ctx, next) {
 })
 
 router.post('/readnotice', function (ctx, next) {
-  console.log(ctx.request.body);
   ctx.body = {
     code: 0
   }
 })
 
 router.post('/getad', function (ctx, next) {
-  console.log(ctx.request.body.index);
   let result = {}
   if (ctx.request.body.index == 3) {
     result.code = 0

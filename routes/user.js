@@ -1,44 +1,37 @@
 const router = require('koa-router')()
+const {query} = require("../mysql/query"); //引入异步查询方法
+const { QUERY_DATAS_BY_WHERE } = require("../mysql/sql"); //部分引入sql库
 
 router.prefix('/user')
 
-router.post('/login', function (ctx, next) {
+router.post('/login', async (ctx, next) => {
   let result = {}
   const name = ctx.request.body.name
   const password = ctx.request.body.password
-  console.log(ctx.request.body);
-  console.log(name);
-  console.log(typeof (name));
-  console.log(password);
-  console.log(typeof (password));
-  if (name !== 'admin' || password !== '888888') {
+  await query('set names latin1')
+  let query_res = await query(QUERY_DATAS_BY_WHERE("alyun.users","username",name));//异步方法调用
+  
+  if (password !== query_res[0].password) {
     result.code = -1
-    result.message = '账户名或密码错误（admin/888888）'
+    result.message = '账户名或密码错误'
   } else {
     result.code = 0
-    console.log(typeof (result.code));
-    result.message = '下午好' + '，欢迎回来'
-    console.log(typeof (result.message));
+    result.message = '欢迎回来'+query_res[0].username
     result.data = {}
     result.data.user = {
-      name: '熊爸',
-      avatar: 'https://gw.alipayobjects.com/zos/rmsportal/WhxKECPNujWoWEFNdnJE.png',
-      address: '泰安市',
+      name: query_res[0].username,
+      avatar: query_res[0].usericon,
+      address: query_res[0].address,
       position: {
-        CN: "社畜",
-        HK: "計算服務事業群",
-        US: "engineer"
+        CN: query_res[0].user_role == 1?"管理员":"普通用户",
+        HK: query_res[0].user_role == 1?"管理員":"普通用戶",
+        US: query_res[0].user_role == 1?"admin":"user",
       }
     }
-    console.log(typeof (result.data.user));
     result.data.token = 'Authorization:' + Math.random()
-    console.log(typeof (result.data.token));
     result.data.expireAt = new Date(new Date().getTime() + 300 * 60 * 1000)
-    console.log(typeof (result.data.expireAt));
     result.data.permissions = [{ id: 'queryForm', operation: ['add', 'edit'] }]
-    console.log(typeof (result.data.permissions));
     result.data.roles = [{ id: 'admin', operation: ['add', 'edit', 'delete'] }]
-    console.log(typeof (result.data.roles));
   }
   ctx.body = result
 })
