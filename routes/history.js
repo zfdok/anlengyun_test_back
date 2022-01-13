@@ -14,6 +14,16 @@ router.get('/get_device_history_list', async (ctx, next) => {
   let res = await sql_device_rec_history_list(ctx.request.query.device)
   ctx.body = res
 })
+//获取设备单次业务历史记录
+router.get('/get_device_history', async (ctx, next) => {
+  device_name = ctx.query.device;
+  start_time = ctx.query.start_time;
+  last_time = ctx.query.last_time;
+  device_type = ctx.query.type;
+  id = ctx.query.id;
+  let res = await sqlAPI.sql_device_a_rec_all_info_by_time(ctx,device_name, device_type, start_time, last_time)
+  ctx.body = res
+})
 
 router.get('/gen_report', async (ctx, next) => {
   filename = ctx.query.name;
@@ -37,22 +47,17 @@ router.get('/get_report', async (ctx, next) => {
   ctx.type = 'pdf';
   // 读取文件
   const pathUrl = path.join(__dirname, `/static/${filename}.pdf`);
+  console.log("=====================================");
+  console.log(pathUrl);
   ctx.body = fs.createReadStream(pathUrl);
   ctx.set('Content-disposition', 'attachment;filename=' + `${filename}.pdf;filename*=UTF-8`);
-
-  ///////////////////////////////////////
-  // const pathUrl  = "routes/static/al_kh00001_zx_0004_204.pdf"
-  // ctx.attachment(pathUrl);
-  // await send(ctx, pathUrl);
-
-
 })
 
 
 router.post('/set_rec_info', async (ctx, next) => {
   const res = ctx.request.body.data
   await sqlAPI.sql_update_rec_info(res)
-  ctx.body = { success: "OK" }
+  ctx.body = { success: 1 }
 })
 
 ////////////////////////////////////////////////////////////////////////////

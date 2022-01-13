@@ -1,5 +1,25 @@
 const { query } = require("../mysql/query"); //引入异步查询方法
-const { QUERY_A_DATA_BY_WHERE, UPDATE_DATA, UPDATE_DATAS, QUERY_DATAS_BY_WHERES, QUERY_DATAS_BY_WHERE_LIMIT, QUERY_SOME_DATAS_BY_WHERES } = require("../mysql/sql"); //部分引入sql库
+const { QUERY_DATAS_BY_WHERE,QUERY_A_DATA_BY_WHERE, UPDATE_DATA, UPDATE_DATAS, QUERY_DATAS_BY_WHERES, QUERY_DATAS_BY_WHERE_LIMIT, QUERY_SOME_DATAS_BY_WHERES } = require("../mysql/sql"); //部分引入sql库
+
+
+//--------------------用户方面------------------------------//
+QUERY_DATAS_BY_WHERE
+let sql_user_by_name = async(name)=>{
+  res = await query(QUERY_DATAS_BY_WHERES("alyun.users", `username='${name}'`))
+  console.log(res);
+  if (res.length) {
+    return res[0]
+  }else{
+    return false
+  }
+}
+
+let update_user_by_name = async(username,user_group_name,commpany,address,email,sms_span,sms_day_limit)=>{
+  res = await query(UPDATE_DATAS("alyun.users",  `user_group_name = '${user_group_name}',commpany = '${commpany}',address='${address}',email='${email}',sms_day_limit=${sms_day_limit},sms_span=${sms_span}`, "username", `'${username}'`));
+  return true
+}
+
+//--------------------消息方面------------------------------//
 
 let sql_unreaded_notice = async (username) => {
   console.log(username);
@@ -29,6 +49,7 @@ update_firstshow = async (msg_id) => {
 sql_device_rec_history_list = async (device_name) => {
   return await query(QUERY_DATAS_BY_WHERE_LIMIT("alyun.device_rec_timerecord", "device_name", device_name, 20, "id", "desc"));
 }
+
 sql_rec_timerecord_by_id = async (device_name, start_time) => {
   await query('set names utf8')
   return await query(QUERY_DATAS_BY_WHERES("alyun.device_rec_timerecord", `device_name = '${device_name}' and start_time ='${start_time}'`));
@@ -40,6 +61,12 @@ sql_device_rec_by_time = async (device_name, device_type, start_time, last_time)
   }
 }
 
+//获取一段记录的所有信息
+sql_device_a_rec_all_info_by_time = async (ctx,device_name, device_type, start_time, last_time) => {
+  if (device_type == ctx.state.projectID_zx) {
+    return await query(QUERY_DATAS_BY_WHERES("alyun.zx_device_history", `device_name = '${device_name}' and timestamp between '${start_time}' and '${last_time}'`));
+  }
+}
 sql_update_rec_info = async (data) => {
   await query('set names utf8')
   return await query(UPDATE_DATAS("alyun.device_rec_timerecord",
@@ -52,6 +79,8 @@ sql_update_rec_info = async (data) => {
 
 
 module.exports = {
+  sql_user_by_name,
+  update_user_by_name,
   sql_unreaded_notice,
   sql_groupid_by_user,
   sql_groupid_by_device,
@@ -61,4 +90,5 @@ module.exports = {
   sql_device_rec_by_time,
   sql_rec_timerecord_by_id,
   sql_update_rec_info,
+  sql_device_a_rec_all_info_by_time,
 }

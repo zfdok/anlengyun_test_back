@@ -15,6 +15,8 @@ const onenet = require('./routes/onenet')
 const history = require('./routes/history')
 const sslify = require('koa-sslify').default
 
+const checkToken = require('./middleware/checkToken.js')
+
 app.use(sslify())
 
 app.use(
@@ -47,6 +49,7 @@ app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
 
+
 // logger
 app.use(async (ctx, next) => {
   const start = new Date()
@@ -68,6 +71,9 @@ app.use(async (ctx, next) => {
   ctx.state.userToken1 = 'version=2020-05-29&res=userid%2F163120&et=1763514709&method=sha1&sign=ftEhYGS5HqfRd7ubdLJ5JQGizkY%3D'
   await next();
 })
+
+// 验证token的中间件函数
+app.use(checkToken)
 
 // routes
 app.use(index.routes(), index.allowedMethods())

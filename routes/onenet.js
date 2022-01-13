@@ -5,7 +5,7 @@ router.prefix('/onenet')
 
 //根据前端传入的type确定产品类型
 function get_product_type(ctx, type) {
-  let product_id = ""
+  let product_id = type
   switch (type) {
     case 'zx':
       product_id = ctx.state.projectID_zx
@@ -128,8 +128,46 @@ router.get('/get_device_latest', async (ctx, next) => {
         Authorization: ctx.state.userToken1
       }
     }, function (error, response, body) {
-      result.msg = response
-      result.code = 0;
+      result = JSON.parse(response.body)
+      result.code = 200;
+      result.msg = "请求成功"
+      ctx.body = result
+      resolve(next());
+    })
+  });//return
+}//async
+), //get
+  function () {
+    ctx.body;
+  }
+
+//获取设备属性最新定位
+router.get('/get_device_latest_lbs', async (ctx, next) => {
+  let result = {
+    code: -1
+  }
+  let device_name = ctx.request.query.device_name
+  let type = ctx.request.query.type
+  let product_id = get_product_type(ctx, type)
+  return new Promise((resolve, reject) => {
+    request({
+      method: 'GET',
+      timeout: 5000,
+      url:
+        'http://openapi.heclouds.com/lbs',
+      qs: {
+        action: 'latestLocation',
+        version: 1,
+        product_id: product_id,
+        device_name: device_name
+      },
+      headers: {
+        Authorization: ctx.state.userToken1
+      }
+    }, function (error, response, body) {
+      result = JSON.parse(response.body)
+      result.code = 200;
+      result.msg = "请求成功"
       ctx.body = result
       resolve(next());
     })
@@ -167,8 +205,9 @@ router.get('/get_device', async (ctx, next) => {
         Authorization: ctx.state.userToken1
       }
     }, function (error, response, body) {
-      result.msg = response
-      result.code = 0;
+      result = JSON.parse(response.body)
+      result.code = 200
+      result.msg = "请求成功"
       ctx.body = result
       resolve(next());
     })
@@ -229,39 +268,47 @@ router.get('/get_user_devicelist_by_type', async (ctx, next) => {
   }
   let username = ctx.request.query.user
   let user_group_id;
-  let product_id = ctx.request.query.type
+  let product_id = get_product_type(ctx, ctx.request.query.type)
 
   //查询用户分组ID
   user_group_id = await get_groupid_by_user(username)
-  return new Promise((resolve, reject) => {
-    request({
-      method: 'GET',
-      timeout: 5000,
-      url:
-        'http://openapi.heclouds.com/application',
-      qs: {
-        action: 'QueryDeviceList',
-        version: 1,
-        project_id: ctx.state.projectID1,
-        group_id: user_group_id,
-        product_id: product_id,
-        limit: 100
-      },
-      headers: {
-        Authorization: ctx.state.userToken1
-      }
-    }, function (error, response, body) {
-      result.msg = response
-      result.code = 0;
-      ctx.body = result
-      resolve(next());
-    })
-  });//return
-}//async
-), //get
-  function () {
-    ctx.body;
+  let rsp = await new Promise((resolve, reject) => {
+    request(
+      {
+        method: 'GET',
+        timeout: 5000,
+        url:
+          'http://openapi.heclouds.com/application',
+        qs: {
+          action: 'QueryDeviceList',
+          version: 1,
+          project_id: ctx.state.projectID1,
+          group_id: user_group_id,
+          product_id: product_id,
+          limit: 100
+        },
+        headers: {
+          Authorization: ctx.state.userToken1
+        }
+      }, function (error, response, body) {
+        resolve(JSON.parse(body));
+      })
+  });
+  if (rsp.success) {
+    result.code = 200
+    result.message = '请求成功'
+    result.data = rsp.data
+    ctx.body = result
+  } else {
+    ctx.body = {
+      code: 500,
+      status: 500,
+      message: '请求错误',
+      data: '请求错误'
+    }
   }
+})
+
 
 //获取用户拥有的
 router.get('/get_device_history', async (ctx, next) => {
@@ -347,8 +394,12 @@ router.get('/get_device_desired', async (ctx, next) => {
       resolve(response.body.data);
     })
   });//return
-  // console.log(rsp);
-  ctx.body = rsp
+  let result = {
+    data: rsp,
+    msg: "请求成功",
+    code: 200
+  }
+  ctx.body = result
   return ctx.body
 })
 
@@ -360,6 +411,8 @@ router.get('/set_device_desired', async (ctx, next) => {
   let tempL = parseFloat(ctx.request.query.tempL)
   let tempU = parseFloat(ctx.request.query.tempU)
   let period = parseInt(ctx.request.query.period)
+
+  console.log(product_id);
   let rsp = await new Promise((resolve, reject) => {
     request({
       method: 'POST',
@@ -392,6 +445,8 @@ router.get('/set_device_desired', async (ctx, next) => {
   //将设置数据写入数据库
   if (rsp.success) {
     let query_res = await sqlAPI.sql_groupid_by_device(device_name);
+    console.log("query_res");
+    console.log(query_res);
     if (query_res.length) {
       await sqlAPI.update_setting_data(device_name, temp_alarm, tempL, tempU, period)
       // console.log(update_query_res);
@@ -406,6 +461,8 @@ router.get('/set_device_desired', async (ctx, next) => {
       })
     }
   }
+  rsp.code = 200
+  rsp.msg = "请求成功"
   ctx.body = rsp
   return ctx.body
 })
@@ -440,9 +497,35 @@ router.get('/set_device_name', async (ctx, next) => {
   console.log(rsp);
   console.log(rsp.success);
   // console.log(rsp.body.success);
-  ctx.body = { "success": rsp.success }
+  ctx.body = {
+    "success": rsp.success,
+    code: 200,
+    msg: "请求成功"
+  }
   // return ctx.body
 })
+
+
+// async function test() {
+//   let username = 'admin'
+//   let phoneNum = '15853823881'
+//   let username = 2913
+//   // console.log(request);
+//   // let res = request({
+//   //   method: 'GET',
+//   //   timeout: 5000,
+//   //   url:
+//   //     'http://www.anlengyun.com:3001//users/check_sms_code',
+//   //   qs: {
+//   //     username,
+//   //     phoneNum,
+//   //     code
+//   //   },
+//   // })
+//   // console.log(res);
+// }
+
+// test()
 
 
 module.exports = router

@@ -12,6 +12,7 @@
     "debug": "^4.1.1",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
     "jspdf": "^2.3.1",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
