@@ -219,11 +219,18 @@ drawChart = (doc, data, upper, lower, y) => {
   }
   // 时间轴刻度
   let t = 0
-  for (let i = 0; i < data.length; i += (Math.floor(data.length / 5))) {
-    console.log(i);
-    var splitTitle = doc.splitTextToSize(`${data[i].timestamp}`, 20);
-    doc.text(posx(t - 5), posy(-6), splitTitle)
-    t += 150 / 5
+  if (data.length > 5) {
+    for (let i = 0; i < data.length; i += (Math.floor(data.length / 5))) {
+      var splitTitle = doc.splitTextToSize(`${data[i].timestamp}`, 20);
+      doc.text(posx(t - 5), posy(-6), splitTitle)
+      t += 150 / 5
+    }
+  } else {
+    for (let i = 0; i < data.length; i++) {
+      var splitTitle = doc.splitTextToSize(`${data[i].timestamp}`, 20);
+      doc.text(posx(t - 5), posy(-6), splitTitle)
+      t += 150 / 5
+    }
   }
   // var splitTitle = doc.splitTextToSize(`${data[data.length - 1].timestamp}`, 20);
   // doc.text(posx(150 - 5), posy(-6), splitTitle)

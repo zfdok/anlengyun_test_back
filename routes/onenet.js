@@ -185,6 +185,7 @@ router.get('/get_device', async (ctx, next) => {
   let username = ctx.request.query.user
   let device_name = ctx.request.query.device_name
   let type = ctx.request.query.type
+  console.log(type);
   let product_id = get_product_type(ctx, type)
   //查询用户分组ID
   user_group_id = await get_groupid_by_user(username)
@@ -505,27 +506,165 @@ router.get('/set_device_name', async (ctx, next) => {
   // return ctx.body
 })
 
+router.get('/check_device_exist', async (ctx, next) => {
+  let device_name = ctx.request.query.device
+  let res = await sqlAPI.sql_groupid_by_device(device_name)
+  console.log(res);
+  if (res.length > 0) {
+    console.log("找到了");
+    ctx.body = {
+      code: 200,
+      data: {
+        success: 0,
+        msg: "设备已经被绑定"
+      }
+    }
+  } else {
+    console.log("没找到");
+    ctx.body = {
+      code: 200,
+      data: {
+        success: 1,
+        msg: "设备未被绑定"
+      }
+    }
+  }
+})
 
+router.get('/set_device_to_project', async (ctx, next) => {
+  let type = ctx.request.query.type
+  let product_id = get_product_type(ctx, type)
+  let device = ctx.request.query.device
+  console.log(product_id);
+  console.log(device);
+  return new Promise((resolve, reject) => {
+    request({
+      method: 'POST',
+      timeout: 5000,
+      url:
+        'http://openapi.heclouds.com/application',
+      headers: {
+        Authorization: ctx.state.userToken1
+      },
+      qs: {
+        action: 'AddDevice',
+        version: 1,
+      },
+      json: true,
+      body: {
+        "project_id": ctx.state.projectID1,
+        "product_id": product_id,
+        "devices": [device]
+      }
+    }, function (error, response, body) {
+      console.log(response.body.data);
+      if (response.body.data.error_data.length == 0) {
+        ctx.body = {
+          code: 200,
+          data: {
+            success: 1,
+            msg: "设备成功添加至项目"
+          }
+        }
+      } else {
+        ctx.body = {
+          code: 200,
+          data: {
+            success: 0,
+            msg: response.body.data.error_data[0].cause
+          }
+        }
+      }
+      resolve(next());
+    })
+  })
+}), //get
+  function () {
+    ctx.body;
+  }
+
+
+
+router.get('/set_device_to_group', async (ctx, next) => {
+  let type = ctx.request.query.type
+  let product_id = get_product_type(ctx, type)
+  let device = ctx.request.query.device
+  let group_id = await get_groupid_by_user(ctx.request.query.user)
+  return new Promise((resolve, reject) => {
+    request({
+      method: 'POST',
+      timeout: 5000,
+      url:
+        'http://openapi.heclouds.com/application',
+      headers: {
+        Authorization: ctx.state.userToken1
+      },
+      qs: {
+        action: 'AddGroupDevice',
+        version: 1,
+      },
+      json: true,
+      body: {
+        "project_id": ctx.state.projectID1,
+        "product_id": product_id,
+        "group_id": group_id,
+        "devices": [device]
+      }
+    }, function (error, response, body) {
+      console.log(response.body.data);
+      console.log(response.body.data.error_data);
+      if (response.body.data.error_data) {
+        ctx.body = {
+          code: 200,
+          data: {
+            success: 0,
+            msg: response.body.data.error_data[0].cause
+          }
+        }
+      } else {
+        sqlAPI.updateDeviceAndGroupInfo({
+          device_name: device,
+          product_id,
+          group_id,
+        })
+        ctx.body = {
+          code: 200,
+          data: {
+            success: 1,
+            msg: "设备绑定成功"
+          }
+        }
+      }
+      resolve(next());
+    })
+  })
+}), //get
+  function () {
+    ctx.body;
+  }
+
+
+router.get('/get_device_tags', async (ctx, next) => {
+  let device = ctx.request.query.device
+  console.log(device);
+  let res = await sqlAPI.sql_info_by_device(device)
+  ctx.body = { data: res[0], code: 200 }
+})
+
+router.get('/set_device_tags', async (ctx, next) => {
+  let device = ctx.request.query.device
+  let tags = ctx.request.query.tags
+  let res = await sqlAPI.update_tags_by_device(device, tags)
+
+  if (res.affectedRows > 0) {
+    ctx.body = { data: "请求成功!", code: 200, msg: "请求成功!" }
+  } else {
+    ctx.body = { data: "请求失败!", code: 200, msg: "请求失败!" }
+  }
+})
 // async function test() {
-//   let username = 'admin'
-//   let phoneNum = '15853823881'
-//   let username = 2913
-//   // console.log(request);
-//   // let res = request({
-//   //   method: 'GET',
-//   //   timeout: 5000,
-//   //   url:
-//   //     'http://www.anlengyun.com:3001//users/check_sms_code',
-//   //   qs: {
-//   //     username,
-//   //     phoneNum,
-//   //     code
-//   //   },
-//   // })
-//   // console.log(res);
+
 // }
 
 // test()
-
-
 module.exports = router

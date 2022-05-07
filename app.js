@@ -13,6 +13,7 @@ const routes = require('./routes/routes')
 const headernotice = require('./routes/headernotice')
 const onenet = require('./routes/onenet')
 const history = require('./routes/history')
+const alapp = require('./routes/alapp')
 const sslify = require('koa-sslify').default
 
 const checkToken = require('./middleware/checkToken.js')
@@ -82,6 +83,7 @@ app.use(routes.routes(), routes.allowedMethods())
 app.use(headernotice.routes(), headernotice.allowedMethods())
 app.use(onenet.routes(), onenet.allowedMethods())
 app.use(history.routes(), history.allowedMethods())
+app.use(alapp.routes(), alapp.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {

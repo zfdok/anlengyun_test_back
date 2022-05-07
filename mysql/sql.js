@@ -47,7 +47,7 @@ var DELETE_DATAS = (tableName) => `DELETE FROM ${tableName};`;
 //(6) 更新数据条目
 var UPDATE_DATA = (tableName, colum, value, where, keyword) =>
   `UPDATE ${tableName} SET ${colum} = ${value} WHERE ${where} = ${keyword};`;
-//(6) 更新多个条目数据
+//(6) 更新多个条目数据 
 var UPDATE_DATAS = (tableName, colum_value, where, keyword) =>
   `UPDATE ${tableName} SET ${colum_value} WHERE ${where} = ${keyword};`;
 /************************查询操作相关************************
@@ -60,6 +60,7 @@ var QUERY_DATAS_BY_WHERE = (tableName, where, keyword) => `SELECT * FROM ${table
 var QUERY_DATAS_BY_WHERE_LIMIT = (tableName, where, keyword, limit, order, desc) => `SELECT * FROM ${tableName} WHERE ${where} = '${keyword}' order by  ${order}  ${desc}  limit ${limit};`;
 //(3) 通过多个条件where查询
 var QUERY_DATAS_BY_WHERES = (tableName, where_keyword) => `SELECT * FROM ${tableName} WHERE ${where_keyword};`;
+var QUERY_DATAS_BY_WHERES_LIMIT = (tableName, where_keyword, limit, order, desc) => `SELECT * FROM ${tableName} WHERE ${where_keyword}  order by  ${order}  ${desc}  limit ${limit};`;
 //(2) 通过where查询
 var QUERY_A_DATA_BY_WHERE = (tableName, where, keyword, selectword) => `SELECT ${selectword} FROM ${tableName} WHERE ${where} = '${keyword}';`;
 //(3) 通过多个条件where查询
@@ -105,4 +106,5 @@ module.exports = {
   QUERY_A_DATA_BY_WHERE,
   QUERY_SOME_DATAS_BY_WHERES,
   QUERY_DATAS_BY_WHERES,
+  QUERY_DATAS_BY_WHERES_LIMIT,
 };

@@ -12,12 +12,18 @@ router.post('/login', async (ctx, next) => {
   let result = {}
   const name = ctx.request.body.name
   const password = ctx.request.body.password
+
   await query('set names utf8')
   let query_res = await query(QUERY_DATAS_BY_WHERE("alyun.users", "username", name));//异步方法调用
-  if (password !== query_res[0].password) {
+  if (!query_res[0]) {
+    result.code = 401
+    result.message = '账户名或密码错误'
+  }
+  else if (password !== query_res[0].password) {
     result.code = 401
     result.message = '账户名或密码错误'
   } else {
+    console.log(query_res[0]);
     result.code = 200
     result.message = '欢迎回来' + query_res[0].username
     result.data = {}
@@ -25,6 +31,7 @@ router.post('/login', async (ctx, next) => {
       name: query_res[0].username,
       avatar: query_res[0].usericon,
       address: query_res[0].address,
+      commpany: query_res[0].commpany,
       position: {
         CN: query_res[0].user_role == 1 ? "管理员" : "普通用户",
         HK: query_res[0].user_role == 1 ? "管理員" : "普通用戶",
@@ -56,6 +63,28 @@ router.get('/checktoken', async (ctx, next) => {
     message: '已登陆',
     data: '已登陆'
   }
+})
+
+router.post('/check_password', async (ctx, next) => {
+  const username = ctx.request.body.params.username
+  const password = ctx.request.body.params.password
+  let res = await sqlAPI.sql_use_pass_by_name(username)
+  if (res == password) {
+    ctx.body = {
+      code: 200,
+      status: 200,
+      message: '密码正确',
+      data: '密码正确'
+    }
+  } else {
+    ctx.body = {
+      code: 400,
+      status: 400,
+      message: '密码错误',
+      data: '密码错误'
+    }
+  }
+
 })
 
 router.get('/get_user_info', async (ctx, next) => {
@@ -150,6 +179,68 @@ router.get('/check_sms_code', async (ctx, next) => {
   });
   console.log(res);
   ctx.body = res
+})
+router.get('/update_sms_day_limit', async (ctx, next) => {
+  let username = ctx.request.query.username
+  let num = ctx.request.query.num
+  await sqlAPI.update_sms_day_count_by_name(username, num)
+  ctx.body = {
+    code: 200,
+    status: 200,
+    message: '密码正确',
+    data: '密码正确'
+  }
+})
+
+router.get('/get_user_device_info', async (ctx, next) => {
+  let username = ctx.request.query.username
+  let user_group_id = await sqlAPI.sql_groupid_by_user(username)
+  let res = await sqlAPI.sql_devices_by_groupid(user_group_id)
+  if (res) {
+    ctx.body = {
+      code: 200,
+      status: 200,
+      message: '获取设备成功',
+      data: res
+    }
+  } else {
+    ctx.body = {
+      code: 400,
+      status: 400,
+      message: '获取设备失败',
+      data: '获取设备失败'
+    }
+  }
+
+})
+
+router.post('/change_pass', async (ctx, next) => {
+  const username = ctx.request.body.params.username
+  const password = ctx.request.body.params.password
+  console.log(username);
+  console.log(password);
+  let res = await sqlAPI.update_user_pass(username, password)
+  console.log(res);
+  ctx.body = {
+    code: 200,
+    status: 200,
+    message: '修改成功',
+    data: '修改成功'
+  }
+})
+
+router.get('/set_user_phone', async (ctx, next) => {
+  let phone = ctx.request.query.phone
+  let username = ctx.request.query.username
+  console.log(phone);
+  console.log(username);
+  let res = sqlAPI.update_user_phone(username,phone)
+  ctx.body = {
+    code: 200,
+    status: 200,
+    message: '设置用户手机号',
+    data: res
+  }
 })
 
 module.exports = router
