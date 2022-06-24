@@ -12,8 +12,8 @@ let sql_user_by_name = async (name) => {
   }
 }
 // 更新用户信息
-let update_user_by_name = async (username, user_group_name, commpany, address, email, sms_span, sms_day_limit) => {
-  res = await query(UPDATE_DATAS("alyun.users", `user_group_name = '${user_group_name}',commpany = '${commpany}',address='${address}',email='${email}',sms_day_limit=${sms_day_limit},sms_span=${sms_span}`, "username", `'${username}'`));
+let update_user_by_name = async (username, user_group_name, commpany, address, email, sms_span, sms_day_limit, alert_phones) => {
+  res = await query(UPDATE_DATAS("alyun.users", `user_group_name = '${user_group_name}',commpany = '${commpany}',address='${address}',email='${email}',sms_day_limit=${sms_day_limit},sms_span=${sms_span},alert_phones='${alert_phones}'`, "username", `'${username}'`));
   return true
 }
 // 获取用户密码

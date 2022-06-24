@@ -116,7 +116,9 @@ router.get('/set_user_info', async (ctx, next) => {
   let email = ctx.request.query.email
   let sms_span = ctx.request.query.sms_span
   let sms_day_limit = ctx.request.query.sms_day_limit
-  let res = await sqlAPI.update_user_by_name(username, user_group_name, commpany, address, email, sms_span, sms_day_limit)
+  let alert_phones = ctx.request.query.alert_phones
+  console.log(alert_phones);
+  let res = await sqlAPI.update_user_by_name(username, user_group_name, commpany, address, email, sms_span, sms_day_limit, alert_phones)
   if (res) {
     res.password = ''
     ctx.body = {
@@ -234,7 +236,7 @@ router.get('/set_user_phone', async (ctx, next) => {
   let username = ctx.request.query.username
   console.log(phone);
   console.log(username);
-  let res = sqlAPI.update_user_phone(username,phone)
+  let res = sqlAPI.update_user_phone(username, phone)
   ctx.body = {
     code: 200,
     status: 200,
